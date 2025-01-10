@@ -6,3 +6,6 @@
 	path = performance-tools
 	url = https://github.com/intel-retail/performance-tools
 	branch = main
+[submodule "use-cases/opea/GenAIExamples"]
+	path = use-cases/opea/GenAIExamples
+	url = https://github.com/opea-project/GenAIExamples.git
