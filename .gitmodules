@@ -9,3 +9,9 @@
 [submodule "use-cases/opea/GenAIExamples"]
 	path = use-cases/opea/GenAIExamples
 	url = https://github.com/opea-project/GenAIExamples.git
+[submodule "use-cases/opea/GenAIComps"]
+	path = use-cases/opea/GenAIComps
+	url = https://github.com/opea-project/GenAIComps.git
+[submodule "use-cases/opea/GenAIEval"]
+	path = use-cases/opea/GenAIEval
+	url = https://github.com/opea-project/GenAIEval
