@@ -118,10 +118,10 @@ def get_summaries(transcript):
         formatted_prompt = ov_llm.pipeline.tokenizer.apply_chat_template(template, tokenize=False)
         summary = ov_llm.invoke(formatted_prompt)
         summary = summary.replace('assistant\n\n', '')
-        print("Summaririze this: ", len(text), " ", text)
-        print("\n--Chapterization: ", summary)
-        print("-------------------------")
-        print('\n\n')
+        #print("Summaririze this: ", len(text), " ", text)
+        #print("\n--Chapterization: ", summary)
+        #print("-------------------------")
+        #print('\n\n')
         transcript[i].metadata["summary"] = summary
 
 
