@@ -18,5 +18,5 @@ then
 	ENABLE_FLAGS="$ENABLE_FLAGS $KMEANS_ENABLE_FLAG"
 fi
 
-echo "Run Video Summarization"
+echo "Run chapterization"
 python3 chapterization.py $INPUT_FILE --model_id $LLM_MODEL --device $INF_DEVICE --asr_batch_size $ASR_BATCH_SIZE --llm_batch_size $LLM_BATCH_SIZE --asr_model_id $ASR_MODEL $ENABLE_FLAGS
