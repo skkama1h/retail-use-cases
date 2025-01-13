@@ -13,21 +13,7 @@ Get started by running the below command.
 
 Run the below command to start the demo with the following defaults:
 
-LLM Model: llama-3.2b-instruct-ov<br>
-LLM batch-size: 1<br>
-ASR Model: distil-whisper/distil-small.en<br>
-ASR load in 8bit: False<br>
-ASR batch-size: 1<br>
-Inference Device: CPU<br>
-K-Means Clustering Enabled For Text : True
-
-```
-./run-demo.sh audio.mp3
-```
-
-Run the below command to start the demo with the following defaults:
-
-LLM Model: llama-3.2b-instruct-ov<br>
+LLM Model: llmware/llama-3.2b-instruct-ov<br>
 LLM batch-size: 2<br>
 ASR Model: distil-whisper/distil-small.en<br>
 ASR load in 8bit: True<br>
@@ -36,7 +22,7 @@ Inference Device: GPU<br>
 K-Means Clustering Enabled For Text : True<br>
 
 ```
-export LLM_MODEL=llama-3.2b-instruct-ov
+export LLM_MODEL=llmware/llama-3.2b-instruct-ov
 export LLM_BATCH_SIZE=2
 export ASR_MODEL=distil-whisper/distil-small.en
 export ASR_LOAD_IN_8BIT=1
