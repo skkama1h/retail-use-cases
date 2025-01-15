@@ -17,6 +17,8 @@ Note: if this script has already been performed and you'd like to install code c
 
 ## Run Examples
 
+This sample requires an audio file. A sample wav file can be downloaded [here](https://github.com/intel/intel-extension-for-transformers/raw/refs/heads/main/intel_extension_for_transformers/neural_chat/assets/audio/sample_2.wav)
+
 Run the below command to start the demo with the following defaults:
 
 LLM Model: llmware/llama-3.2-3b-instruct-ov<br>
