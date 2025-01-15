@@ -29,8 +29,7 @@ source langchain_audio_qna_env/bin/activate
 
 python -m pip install --upgrade pip
 pip install wheel setuptools langchain-openai langchain_community outetts ipython
-#sounddevice
 pip install --upgrade-strategy eager "optimum[openvino,nncf]" langchain-huggingface torchaudio
-#git clone https://github.com/gsilva2016/langchain.git
-#pushd langchain; git checkout openvino_asr_loader; popd
+git clone https://github.com/gsilva2016/langchain.git
+pushd langchain; git checkout openvino_tts_tool; popd
 pip install -e langchain/libs/community
