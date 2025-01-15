@@ -26,7 +26,7 @@ LLM batch-size: 2<br>
 ASR Model: distil-whisper/distil-small.en<br>
 ASR load in 8bit: True<br>
 ASR batch-size: 8<br>
-Inference Device: CPU<br>
+Inference Device: GPU<br>
 
 ```
 export LLM_MODEL=llmware/llama-3.2-3b-instruct-ov
