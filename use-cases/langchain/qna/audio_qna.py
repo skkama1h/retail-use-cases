@@ -15,7 +15,7 @@ from langchain_text_splitters import CharacterTextSplitter
 from langchain.text_splitter import RecursiveCharacterTextSplitter
 import ast
 
-MAX_NEW_TOKENS = 5040
+MAX_NEW_TOKENS = 512
 
 parser = argparse.ArgumentParser()
 parser.add_argument("audio_file")
