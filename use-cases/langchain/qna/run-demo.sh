@@ -12,10 +12,10 @@ then
 	ENABLE_FLAGS=$ASR_8BIT_ENABLE_FLAG
 fi
 
-if [ "$TTS_MODEL" == "kokoro" ]
+KOKORO_LAUNCHED=$(docker ps -f name=kokoro | wc -l)
+if [ "$TTS_MODEL" == "kokoro" ] && [ "$KOKORO_LAUNCHED" == "1" ]
 then
-	export HUGGINGFACE_API_KEY="none"
-	docker run -itd --name "kokoro" -p 8880:8880 ghcr.io/remsky/kokoro-fastapi-cpu:v0.1.0post1 # CPU 
+	docker run --rm -itd --name "kokoro" -p 8880:8880 ghcr.io/remsky/kokoro-fastapi-cpu:v0.1.0post1 # CPU 
 fi
 
 if [ "$TTS_MODEL" == "" ]
