@@ -4,6 +4,7 @@ import os
 from langchain_huggingface import HuggingFacePipeline
 from langchain_community.document_loaders import OpenVINOSpeechToTextLoader
 from langchain_community.tools import OpenVINOText2SpeechTool
+from langchain_community.tools import OpenAIText2SpeechTool
 from langchain_core.prompts import PromptTemplate, ChatPromptTemplate
 
 from langchain_core.runnables import RunnablePassthrough
@@ -37,6 +38,7 @@ print("ASR load_in_8bit: ", args.asr_load_in_8bit)
 print("TTS model_id: ", args.tts_model_id)
 print("Inference device  : ", args.device)
 print("Audio file: ", args.audio_file)
+print("TTS model_id: ", args.tts_model_id)
 #input("Press Enter to continue...")
 
 asr_loader = OpenVINOSpeechToTextLoader(args.audio_file, 
@@ -57,9 +59,19 @@ ov_llm = HuggingFacePipeline.from_model_id(
 )
 ov_llm.pipeline.tokenizer.pad_token_id = ov_llm.pipeline.tokenizer.eos_token_id
 
-tts = OpenVINOText2SpeechTool(model_id="OuteAI/OuteTTS-0.1-350M",
+if not args.tts_model_id == "kokoro":
+    tts = OpenVINOText2SpeechTool(model_id=args.tts_model_id,
         device="CPU", 
-        load_in_8bit=True)
+        load_in_8bit=True
+    )
+else:
+    # replace this with new openai speech endpoint instead
+    tts = OpenAIText2SpeechTool(
+            model_id=args.tts_model_id,
+            voice="af_sky+af_bella", #single or multiple voicepack combo
+            base_url="http://localhost:8880/v1",
+            api_key="not-needed"
+    )
 
 start_time = time.time()
 docs = asr_loader.load()
