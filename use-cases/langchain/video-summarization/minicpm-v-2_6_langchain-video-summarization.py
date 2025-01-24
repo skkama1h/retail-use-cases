@@ -1,3 +1,4 @@
+import os
 import torch
 import argparse
 from PIL import Image
@@ -27,11 +28,11 @@ def encode_video(video_path):
 class MiniCPMV26Wrapper(LLM):
     model: object 
     tokenizer: object
-    max_length: int = Field(default=128)
+    max_token_length: int = Field(default=128)
 
     @property
     def _llm_type(self) -> str:
-        return "Custom MiniCPM-V-2_6"
+        return "Custom OV MiniCPM-V-2_6"
 
     def _call(
         self,
@@ -45,34 +46,41 @@ class MiniCPMV26Wrapper(LLM):
         params["max_slice_nums"] = 2 # use 1 if cuda OOM and video resolution >  448*448
 
         # Format prompt for "model.chat()"
-        prompt = prompt.split(',')
-        frames = encode_video(prompt[0])
-        question = prompt[-1]        
+        video_fh, question = prompt.split(',')
+        frames = encode_video(video_fh)
         msgs = [{'role': 'user', 'content': frames + [question]},]
 
         # Chat
         response = self.model.chat(
             image=None,
             msgs=msgs,
+            max_length=self.max_token_length,
             tokenizer=self.tokenizer,
             **params
         )
         
-        return str(response)
+        return response
 
 if __name__ == '__main__':
 
     # Parse inputs
-    parser = argparse.ArgumentParser()
-    parser.add_argument("video_file")
-    parser.add_argument("prompt")
+    parser_txt = "Generate video summarization using Langchanin, Openvino-genai, and MiniCPM-V-2_6."
+    parser = argparse.ArgumentParser(parser_txt)
+    parser.add_argument("-v", "--video_file", type=str,
+                        help='Path to video you want to summarize.')
+    parser.add_argument("-p", "--prompt", type=str,
+                        help="Text prompt. By default set to: `Please summarize this video.`",
+                        default="Please summarize this video.")
     args = parser.parse_args()
-    
-    # Set globals model (To Do: make flexible from cli)
-    MAX_NEW_TOKENS = 5040
+    if not os.path.exists(args.video_file):
+        print(f"{args.video_file} does not exist.")
+        exit()
+        
+    # Set globals model (To Do: make tokens actually used, make both flexible from cli)
+    MAX_NEW_TOKENS = 5040 
     MAX_NUM_FRAMES = 64 # if OOM set a smaller number
 
-    # Load Model
+    # Load Model (To Do: openvino-genai)
     model = AutoModel.from_pretrained('openbmb/MiniCPM-V-2_6',
                                       trust_remote_code=True,
                                       attn_implementation='sdpa',
@@ -82,9 +90,9 @@ if __name__ == '__main__':
                                               trust_remote_code=True)
 
     # Wrap model in custom wrapper
-    minicpm_llm = MiniCPMV26Wrapper(model=model,
-                                    tokenizer=tokenizer,
-                                    max_length=MAX_NEW_TOKENS)
+    ovminicpm_wrapper = MiniCPMV26Wrapper(model=model,
+                                          tokenizer=tokenizer,
+                                          max_token_length=MAX_NEW_TOKENS)
 
     # Create template for inputs
     prompt = PromptTemplate(
@@ -93,7 +101,7 @@ if __name__ == '__main__':
     )
     
     # Create pipeline and invoke
-    chain =  prompt | minicpm_llm
+    chain =  prompt | ovminicpm_wrapper
     inputs = {"video": args.video_file, "question": args.prompt}    
     output = chain.invoke(inputs)
     print(output)

@@ -1,6 +1,19 @@
+# ##################
+# ### Video Pipeline
+# ##################
+
+python minicpm-v-2_6_langchain-video-summarization.py -v handwashing_10fps.avi
+
+### Example output
+# The video starts with a static image of a stainless steel sink against a patterned tile background. Shortly after, hands enter the frame and begin washing at the faucet, which is turned on. The hands are seen manipulating water to cleanse, with visible soap suds forming as they rub together and over the skin. Throughout the sequence, the focus remains on the handwashing process without any camera movement or change in perspective.
+
+# ##################
+# ### Image Pipeline
+# ##################
+
 # python minicpm-v-2_6_langchain-image-summarization.py my_image.png "What's in this image?"
 
-### Example pipeline
+### Example Output
 # This image is a slide from a presentation about NVIDIA's Data Center business segment. The title, 'Data Center,' is highlighted in green at the top, with a subtitle stating 'The leading computing platform for AI, HPC & graphics.' The slide includes financial data and strategic information.
 
 # On the left side of the slide, there's a bar chart showing revenue growth over fiscal years (FY) from FY19 to 1H FY24. The revenues are as follows:
@@ -25,8 +38,4 @@
 
 # At the bottom right corner, the slide is branded with the NVIDIA logo, indicating the source of the information.
 
-python minicpm-v-2_6_langchain-video-summarization.py handwashing_10fps.avi "Please summarize this video."
-
-##### Example output
-The video starts with a static image of a stainless steel sink against a patterned tile background. Shortly after, hands enter the frame and begin washing at the faucet, which is turned on. The hands are seen manipulating water to cleanse, with visible soap suds forming as they rub together and over the skin. Throughout the sequence, the focus remains on the handwashing process without any camera movement or change in perspective.
 
