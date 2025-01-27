@@ -2,7 +2,7 @@
 # ### Video Pipeline (openvino-genai)
 # ###################################
 
-python minicpm-v-2_6_ov-langchain-video-summarization.py handwashing_10fps.avi MiniCPM_created-as-optimum/ -d "GPU" -f 1
+python minicpm-v-2_6_ov-langchain-video-summarization.py handwashing_10fps.avi MiniCPM_INT4/ -d "GPU" -f 10
 
 ### Example Output
 # Video duration: 1:31
