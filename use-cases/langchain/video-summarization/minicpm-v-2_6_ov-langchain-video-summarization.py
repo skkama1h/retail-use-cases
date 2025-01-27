@@ -11,6 +11,7 @@ from decord import VideoReader, cpu
 from langchain.llms.base import LLM
 from langchain.prompts import PromptTemplate
 from transformers import AutoTokenizer, AutoModel
+from VideoChunkLoader import VideoChunkLoader
 
 def encode_video(video_path, max_num_frames=64):
     def uniform_sample(l, n):
@@ -95,8 +96,14 @@ if __name__ == '__main__':
                         help="Maximum number of tokens to be generated.",
                         default=5040)
     parser.add_argument("-f", "--max_num_frames", type=int,
-                        help="Maximum number of frames to be sampled for inference. Set to a smaller number if OOM.",
+                        help="Maximum number of frames to be sampled per chunk for inference. Set to a smaller number if OOM.",
                         default=64)
+    parser.add_argument("-c", "--chunk_duration", type=int,
+                        help="Maximum length in seconds for each chunk of video.",
+                        default=90)
+    parser.add_argument("-o", "--chunk_overlap", type=int,
+                        help="Overlap in seconds beteen chunks of input video.",
+                        default=2)
     
     args = parser.parse_args()
     if not os.path.exists(args.video_file):
@@ -128,7 +135,26 @@ if __name__ == '__main__':
     
     # Create pipeline and invoke
     chain =  prompt | ovminicpm_wrapper
-    inputs = {"video": args.video_file, "question": args.prompt}
-    st_time = time.time()
-    output = chain.invoke(inputs)
-    print("\nInference time: {} sec".format(time.time() - st_time))
+    # inputs = {"video": args.video_file, "question": args.prompt}
+
+    # Load video create docs
+    loader = VideoChunkLoader(
+        video_path=args.video_file,
+        chunking_mechanism="sliding_window",
+        chunk_duration=args.chunk_duration,
+        chunk_overlap=args.chunk_overlap
+        # specific_intervals=[
+        #     {"start": 5, "duration": 10},
+        #     {"start": 20, "duration": 8},
+        # ],
+    )
+
+    for doc in loader.lazy_load():
+        print(f"Chunk Metadata: {doc.metadata}")
+        print(f"Chunk Content: {doc.page_content}")
+        
+        # Loop through docs
+        st_time = time.time()
+        inputs = {"video": doc.metadata['chunk_path'], "question": args.prompt}        
+        output = chain.invoke(inputs)
+        print("\nInference time: {} sec\n".format(time.time() - st_time))
