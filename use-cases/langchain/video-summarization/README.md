@@ -1,4 +1,4 @@
-# Generate Video Summarizations Using Langchain and MiniCPM-v-2_6  
+# Summarize Videos Using OpenVino-GenAI, Langchain, and MiniCPM-v-2_6  
 
 ## Installation
 * [Install Intel client GPU](https://dgpu-docs.intel.com/driver/client/overview.html)
@@ -13,7 +13,12 @@ pip install nncf openvino-genai timm einopsaa
 pip install -r reqs.txt
 ```
 
-## Run Examples
+## Convert and save MiniCPM-V-2_6
+```
+optimum-cli export openvino -m openbmb/MiniCPM-V-2_6 --trust-remote-code --weight-format int4 MiniCPM_INT4
+```
+
+## Run Video Summarization Examples
 ```
 bash driver.sh
 ```
