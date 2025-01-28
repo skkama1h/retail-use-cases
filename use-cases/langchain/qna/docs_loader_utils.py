@@ -43,8 +43,8 @@ def load_docs(embeddings, skip_docs_loading):
     if not skip_docs_loading:
         documents = []    
         for file_path in os.listdir(TARGET_FOLDER):
-            #if not file_path.endswith('.html'):
-            #    continue
+            if not file_path.endswith('.html') and not file_path.endswith('.pdf'):
+                continue
             abs_path = os.path.join(TARGET_FOLDER, file_path)
             print(f"Loading document {abs_path} embedding into vector store...", flush=True)
             documents.extend(load_single_document(abs_path))
