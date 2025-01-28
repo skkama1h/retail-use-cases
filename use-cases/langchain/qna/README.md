@@ -1,5 +1,5 @@
 # QnA
-Demonstrates a pipeline which performs QnA. The primary components utilize OpenVINO™ in LangChain for audio-speech-recognition, LLM text generation/response, and text-to-speech (currently [OuteAI/OuteTTS-0.1-350M](https://github.com/openvinotoolkit/openvino_notebooks/blob/latest/notebooks/outetts-text-to-speech/outetts-text-to-speech.ipynb)).
+Demonstrates a pipeline which performs QnA. The primary components utilize OpenVINO™ in LangChain for audio-speech-recognition, LLM text generation/response, and text-to-speech (currently [OuteAI/OuteTTS-0.1-350M](https://github.com/openvinotoolkit/openvino_notebooks/blob/latest/notebooks/outetts-text-to-speech/outetts-text-to-speech.ipynb) and [Kokoro](https://huggingface.co/hexgrad/Kokoro-82M)).
 
 ## Installation
 
@@ -12,28 +12,58 @@ Get started by running the below command.
 Note: if this script has already been performed and you'd like to install code change only then the below command can be used instead to skip the re-install of dependencies.
 
 ```
-./install --skip
+./install.sh --skip
 ```
 
 ## Run Examples
 
-This sample requires an audio file. A sample wav file can be downloaded [here](https://github.com/intel/intel-extension-for-transformers/raw/refs/heads/main/intel_extension_for_transformers/neural_chat/assets/audio/sample_2.wav)
+### Audio QnA with RAG
+This sample requires an audio file when DEMO_MODE=0. If DEMO_MODE=1 then audio must provided by the default connected microphone, otherwise an audio file must be provided as input. A sample wav file can be downloaded [here](https://github.com/intel/intel-extension-for-transformers/raw/refs/heads/main/intel_extension_for_transformers/neural_chat/assets/audio/sample_2.wav)
+
+When utilizing RAG_ENABLED=1 the html/pdfs/etc must be stored in the ./docs folder. Files in this directory will automatically be loaded.
 
 Run the below command to start the demo with the following defaults:
 
-LLM Model: llmware/llama-3.2-3b-instruct-ov<br>
+LLM Model: llmware/qwen2-0.5b-chat-ov<br>
 LLM batch-size: 2<br>
 ASR Model: distil-whisper/distil-small.en<br>
 ASR load in 8bit: True<br>
 ASR batch-size: 8<br>
+TTS Model: kokoro<br>
+RAG Enabled: 1<br>
+DEMO MODE: 1<br>
 Inference Device: GPU<br>
 
 ```
-export LLM_MODEL=llmware/llama-3.2-3b-instruct-ov
+export LLM_MODEL="llmware/qwen2-0.5b-chat-ov"
+#export LLM_MODEL="llmware/qwen2-1.5b-instruct-ov" # uncomment for better accuracy
 export LLM_BATCH_SIZE=2
 export ASR_MODEL=distil-whisper/distil-small.en
 export ASR_LOAD_IN_8BIT=1
 export ASR_BATCH_SIZE=8
 export INF_DEVICE=GPU
-./run-demo.sh sample.wav
+export TTS_MODEL="kokoro"
+export RAG_ENABLED=1
+export DEMO_MODE=1
+./run-audio-demo.sh myquestion.wav
+```
+
+This sample requires a user to ask their question when prompted.  When utilizing RAG_ENABLED=1 the html/pdfs/etc must be stored in the ./docs folder. Files in this directory will automatically be lo
+aded.
+
+Run the below command to start the demo with the following defaults:
+
+LLM Model: llmware/qwen2-0.5b-chat-ov<br>
+LLM batch-size: 2<br>
+Inference Device: GPU<br>
+DEMO MODE: 1<br>
+
+```
+export LLM_MODEL="llmware/qwen2-0.5b-chat-ov"
+#export LLM_MODEL="llmware/qwen2-1.5b-instruct-ov" # uncomment for better accuracy
+export LLM_BATCH_SIZE=2
+export INF_DEVICE=GPU
+export DEMO_MODE=1
+export RAG_ENABLED=1
+./run-text-demo.sh
 ```

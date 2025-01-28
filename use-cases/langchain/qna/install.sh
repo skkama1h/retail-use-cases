@@ -7,7 +7,7 @@ then
 else
 	echo "Installing qna dependencies"
 	sudo apt update
-	sudo apt install python3-venv git ffmpeg vim python3 python-is-python3 python3-pip wget -y
+	sudo apt install python3-venv git ffmpeg vim python3 python-is-python3 python3-pip wget portaudio19-dev -y
 	# neo/opencl drivers 24.45.31740.9
 	mkdir neo
 	cd neo
@@ -22,13 +22,18 @@ else
 	# sudo apt install ocl-icd-libopencl1
 	cd ..
 
+	curl https://docs.openvino.ai/2024/openvino-workflow/model-server/ovms_what_is_openvino_model_server.html --create-dirs -o ./docs/ovms_what_is_openvino_model_server.html
+	curl https://docs.openvino.ai/2024/openvino-workflow/model-server/ovms_docs_metrics.html -o ./docs/ovms_docs_metrics.html
+	curl https://docs.openvino.ai/2024/openvino-workflow/model-server/ovms_docs_streaming_endpoints.html -o ./docs/ovms_docs_streaming_endpoints.html
+	curl https://docs.openvino.ai/2024/openvino-workflow/model-server/ovms_docs_target_devices.html -o ./docs/ovms_docs_target_devices.html
+
 fi
 echo "Installing qna"
-python3 -m venv langchain_audio_qna_env
-source langchain_audio_qna_env/bin/activate
+python3 -m venv langchain_qna_env
+source langchain_qna_env/bin/activate
 
 python -m pip install --upgrade pip
-pip install wheel setuptools langchain-openai langchain_community ipython "outetts==0.2.3"
+pip install wheel setuptools langchain-openai langchain_community ipython "outetts==0.2.3" pyaudio unstructured faiss-cpu pdfminer.six
 pip install --upgrade-strategy eager "optimum[openvino,nncf]" langchain-huggingface torchaudio
 git clone https://github.com/gsilva2016/langchain.git
 pushd langchain; git checkout openvino_tts_tool; popd
