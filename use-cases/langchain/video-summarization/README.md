@@ -13,7 +13,7 @@ pip install nncf openvino-genai timm einopsaa
 pip install -r reqs.txt
 ```
 
-## Convert and save MiniCPM-V-2_6
+## Convert and Save MiniCPM-V-2_6
 ```
 optimum-cli export openvino -m openbmb/MiniCPM-V-2_6 --trust-remote-code --weight-format int4 MiniCPM_INT4 # int8 also available 
 ```
