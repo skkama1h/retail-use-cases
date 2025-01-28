@@ -2,6 +2,7 @@ import os
 import time
 import torch
 import argparse
+import numpy as np
 import openvino_genai
 from PIL import Image
 from pydantic import Field
@@ -13,21 +14,20 @@ from langchain.prompts import PromptTemplate
 from transformers import AutoTokenizer, AutoModel
 from VideoChunkLoader import VideoChunkLoader
 
-def encode_video(video_path, max_num_frames=64):
+def encode_video(video_path, max_num_frames=64, resolution=[]):
     def uniform_sample(l, n):
         gap = len(l) / n
         idxs = [int(i * gap + gap / 2) for i in range(n)]
         return [l[i] for i in idxs]
-
-    vr = VideoReader(video_path, ctx=cpu(0))
-    sample_fps = round(vr.get_avg_fps() / 1)  # FPS
-    frame_count = len(vr)
-    duration = frame_count/sample_fps
-    minutes = int(duration/60)
-    seconds = int(duration%60)
-    print(f"Video duration: {minutes}:{seconds}")
-      
-    frame_idx = [i for i in range(0, len(vr), sample_fps)]
+    
+    if len(resolution) != 0:
+        vr = VideoReader(video_path, width=resolution[0],
+                         height=resolution[1], ctx=cpu(0))
+    else:
+        vr = VideoReader(video_path, ctx=cpu(0))
+        
+    # frame_idx = [i for i in range(0, len(vr), sample_fps)]
+    frame_idx = [i for i in range(0, len(vr), int(len(vr)/max_num_frames))]    
     if len(frame_idx) > max_num_frames:
         frame_idx = uniform_sample(frame_idx, max_num_frames)
     frames = vr.get_batch(frame_idx).asnumpy()
@@ -53,6 +53,7 @@ class OVMiniCPMV26Wrapper(LLM):
     ovpipe: object 
     generation_config: object
     max_num_frames: int
+    resolution: list[int]
     
     @property
     def _llm_type(self) -> str:
@@ -64,8 +65,9 @@ class OVMiniCPMV26Wrapper(LLM):
         stop: Optional[List[str]] = None,
     ) -> str:
 
-        video_fh, question = prompt.split(',')
-        frames = encode_video(video_fh, self.max_num_frames)        
+        video_fh, question = prompt.split(',', 1)
+        frames = encode_video(video_fh, self.max_num_frames,
+                              resolution=self.resolution)        
         self.ovpipe.start_chat()
         self.ovpipe.generate(question,
                              images=frames,
@@ -90,8 +92,6 @@ if __name__ == '__main__':
     parser.add_argument("-d", "--device", type=str,
                         help="Target device for running ov MiniCPM-v-2_6",
                         default="CPU")    
-    parser.add_argument("-m", "--model_dir", type=str,
-                        help="Path to openvino-genai optimized model")
     parser.add_argument("-t", "--max_new_tokens", type=int,
                         help="Maximum number of tokens to be generated.",
                         default=5040)
@@ -104,7 +104,10 @@ if __name__ == '__main__':
     parser.add_argument("-o", "--chunk_overlap", type=int,
                         help="Overlap in seconds beteen chunks of input video.",
                         default=2)
-    
+    parser.add_argument("-r", "--resolution", type=int, nargs=2,
+                        help="Desired spatial resolution of input video if different than original. Width x Height")
+
+    tot_st_time = time.time()
     args = parser.parse_args()
     if not os.path.exists(args.video_file):
         print(f"{args.video_file} does not exist.")
@@ -123,9 +126,11 @@ if __name__ == '__main__':
     config.max_new_tokens = args.max_new_tokens
     
     # Wrap model in custom wrapper
+    resolution = [] if not args.resolution else args.resolution
     ovminicpm_wrapper = OVMiniCPMV26Wrapper(ovpipe=pipe,
                                             generation_config=config,
-                                            max_num_frames=args.max_num_frames)
+                                            max_num_frames=args.max_num_frames,
+                                            resolution=resolution)
 
     # Create template for inputs
     prompt = PromptTemplate(
@@ -135,7 +140,6 @@ if __name__ == '__main__':
     
     # Create pipeline and invoke
     chain =  prompt | ovminicpm_wrapper
-    # inputs = {"video": args.video_file, "question": args.prompt}
 
     # Load video create docs
     loader = VideoChunkLoader(
@@ -148,13 +152,16 @@ if __name__ == '__main__':
         #     {"start": 20, "duration": 8},
         # ],
     )
-
+    
     for doc in loader.lazy_load():
-        print(f"Chunk Metadata: {doc.metadata}")
+        # print(f"Chunk Metadata: {doc.metadata}")
         print(f"Chunk Content: {doc.page_content}")
         
         # Loop through docs
-        st_time = time.time()
+        chunk_st_time = time.time()
         inputs = {"video": doc.metadata['chunk_path'], "question": args.prompt}        
         output = chain.invoke(inputs)
-        print("\nInference time: {} sec\n".format(time.time() - st_time))
+        print("\nChunk Inference time: {} sec\n".format(time.time() - chunk_st_time))
+    print("\nTotal Inference time: {} sec\n".format(time.time() - tot_st_time))
+
+    
