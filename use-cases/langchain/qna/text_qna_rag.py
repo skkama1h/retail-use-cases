@@ -70,7 +70,7 @@ ov_llm = HuggingFacePipeline.from_model_id(
         "repetition_penalty": 1.2,
         "encoder_repetition_penalty": 1.2,
         "top_p": 0.8,
-        "temperature": 0.6,
+        "temperature": 0.1,
     })
 ov_llm.pipeline.tokenizer.pad_token_id = ov_llm.pipeline.tokenizer.eos_token_id
 
