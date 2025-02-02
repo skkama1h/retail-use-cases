@@ -35,6 +35,13 @@ class VideoChunkLoader(BaseLoader):
         self.specific_intervals = specific_intervals
         self.output_dir = output_dir
 
+
+        if self.output_dir:
+        # Remove the existing directory if it alreade exists, and create a fresh one before processing new chunks
+            if os.path.exists(self.output_dir):
+                shutil.rmtree(self.output_dir)
+            os.makedirs(self.output_dir)
+        
     def _compute_sliding_window_intervals(self) -> List[Dict]:
         """Compute intervals for sliding window chunking."""
         result = subprocess.run(
@@ -82,12 +89,6 @@ class VideoChunkLoader(BaseLoader):
 
     def _save_video_chunk(self, start_time: float, duration: float, chunk_id: int) -> str:
         """Save a video chunk using ffmpeg."""
-
-        if self.output_dir:
-        # Remove the existing directory if it alreade exists, and create a fresh one before processing new chunks
-            if os.path.exists(self.output_dir):
-                shutil.rmtree(self.output_dir)
-            os.makedirs(self.output_dir)
             
         output_path = os.path.join(self.output_dir, f"chunk_{chunk_id}.mp4")
         command = [

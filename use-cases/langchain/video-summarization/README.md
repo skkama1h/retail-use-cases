@@ -9,8 +9,7 @@
 conda create -n ovlangvidsumm python=3.10
 conda activate ovlangvidsumm
 pip install optimum-intel@git+https://github.com/huggingface/optimum-intel.git
-pip install nncf openvino-genai timm einopsaa
-pip install -r reqs.txt
+pip install nncf openvino-genai timm einops langchain decord
 ```
 
 ## Convert and Save MiniCPM-V-2_6
