@@ -4,8 +4,9 @@ import time
 import argparse
 import openvino_genai
 from langchain.prompts import PromptTemplate
-from VideoChunkLoader import VideoChunkLoader
-from OVMiniCPMV26Wrapper import OVMiniCPMV26Worker
+from ov_lvm_wrapper import OVMiniCPMV26Worker
+from video_chunk_loader import VideoChunkLoader
+
 
 def output_handler(text: str,
                    filename: str = None,
@@ -37,13 +38,13 @@ if __name__ == '__main__':
                         default="CPU")    
     parser.add_argument("-t", "--max_new_tokens", type=int,
                         help="Maximum number of tokens to be generated.",
-                        default=5040)
+                        default=500)
     parser.add_argument("-f", "--max_num_frames", type=int,
                         help="Maximum number of frames to be sampled per chunk for inference. Set to a smaller number if OOM.",
-                        default=64)
+                        default=32)
     parser.add_argument("-c", "--chunk_duration", type=int,
                         help="Maximum length in seconds for each chunk of video.",
-                        default=90)
+                        default=30)
     parser.add_argument("-v", "--chunk_overlap", type=int,
                         help="Overlap in seconds beteen chunks of input video.",
                         default=2)
@@ -84,7 +85,8 @@ if __name__ == '__main__':
 
     # Start log
     output_handler("python " + " ".join(sys.argv),
-                   filename=args.outfile, mode='w')
+                   filename=args.outfile, mode='w',
+                   verbose=False)
     
     # Loop through docs and generate chunk summaries    
     chunk_summaries = []
@@ -103,13 +105,25 @@ if __name__ == '__main__':
         # Log output
         output_handler(output, filename=args.outfile, mode='a', verbose=False)
         chunk_summaries.append(f"Start time: {doc.metadata['start_time']} End time: {doc.metadata['end_time']}\n" + output)
-        print("\nChunk Inference time: {} sec\n".format(time.time() - chunk_st_time))
-        
+        output_handler("\nChunk Inference time: {} sec\n".format(time.time() - chunk_st_time), filename=args.outfile, mode='a')
+
+    # with open(args.outfile, 'r') as FH:
+    #    lines = FH.readlines()
+    #    lines = lines[:len(lines):100]
+    # chunk_summaries = '\n'.join(lines)
+    # print(lines)
+    # exit()
+    
     # Summarize the full video, using the subsections summaries from each chunk
     overall_summ_st_time = time.time()
-    full_summ_prompt = 'The following are summaries of subsections of a video. Each subsection summary is separated by the delimiter ">|<". Each subsection summary will start with the start and end timestamps of the subsection relative to the full video. Please create a summary of the overall video, highlighting all important information, including timestamps:\n\n{}'    
+    full_summ_prompt = 'The following are summaries of subsections of a video. Each subsection summary is separated by the delimiter ">|<". Each subsection summary will start with the start and end timestamps of the subsection relative to the full video. Please create a summary of the overall video, highlighting all important information, including timestamps:\n\n{}'
+
+    
+    chunk_summaries = chunk_summaries[:len(chunk_summaries):100]
+
+    
     inputs = {"video": '', "question": full_summ_prompt.format("\n>|<\n".join(chunk_summaries))}
     output = chain.invoke(inputs)    
-    print("\nOverall video summary inference time: {} sec\n".format(time.time() - overall_summ_st_time))
-    print("\nTotal Inference time: {} sec\n".format(time.time() - tot_st_time))
+    output_handler("\nOverall video summary inference time: {} sec\n".format(time.time() - overall_summ_st_time), filename=args.outfile, mode='a')
+    output_handler("\nTotal Inference time: {} sec\n".format(time.time() - tot_st_time), filename=args.outfile, mode='a')
     output_handler(output, filename=args.outfile, mode='a', verbose=False)
