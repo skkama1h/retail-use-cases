@@ -2,10 +2,10 @@
 
 ## Installation
 * Install Intel Client GPU and OpenVINO Runtime from Archive.
-'''
+```
 # Validated on Ubuntu 24.04 and 22.04
 bash install.sh
-'''
+```
 
 * Create Conda Enviornment and Set Up Python Enviornment 
 ```
