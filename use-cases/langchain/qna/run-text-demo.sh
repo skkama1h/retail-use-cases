@@ -1,6 +1,9 @@
 #!/bin/bash
 
-source langchain_qna_env/bin/activate
+source activate-conda.sh
+activate_conda
+conda activate langchain_qna_env
+
 export TOKENIZERS_PARALLELISM=true
 
 DEMO_MODE_FLAG="--demo_mode"

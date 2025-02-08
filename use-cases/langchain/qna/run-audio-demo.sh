@@ -1,6 +1,9 @@
 #!/bin/bash
 
-source langchain_qna_env/bin/activate
+source activate-conda.sh
+activate_conda
+conda activate langchain_qna_env
+
 export TOKENIZERS_PARALLELISM=true
 
 INPUT_FILE=$1
@@ -21,9 +24,8 @@ fi
 
 if [ "$RAG_ENABLED" == "1" ]
 then
-	ENABLE_FLAGS="$ENABLE_FLAGS $DEMO_RAG_FLAG"
+	ENABLE_FLAGS="$ENABLE_FLAGS $RAG_MODE_FLAG"
 fi
-
 
 KOKORO_LAUNCHED=$(docker ps -f name=kokoro | wc -l)
 if [ "$TTS_MODEL" == "kokoro" ] && [ "$KOKORO_LAUNCHED" == "1" ]
