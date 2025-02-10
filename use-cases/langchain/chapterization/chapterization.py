@@ -38,14 +38,35 @@ print("K-Means enabled: ", args.k_means_enabled)
 print("Audio file: ", args.audio_file)
 #input("Press Enter to continue...")
 
-start_time = time.time()
-
+print("Initializing....")
 asr_loader = OpenVINOSpeechToTextLoader(args.audio_file, 
         args.asr_model_id, 
         device=args.device, 
         load_in_8bit=args.asr_load_in_8bit, 
         batch_size=args.asr_batch_size
 )
+ov_config = {"PERFORMANCE_HINT": "LATENCY", "NUM_STREAMS": "1", "CACHE_DIR": "./cache-ov-models"}
+ov_llm = HuggingFacePipeline.from_model_id(
+    model_id=args.model_id,
+    task="text-generation",
+    backend="openvino",
+    batch_size=args.llm_batch_size,
+    model_kwargs={"device": args.device, "ov_config": ov_config},
+    pipeline_kwargs={
+        "max_new_tokens": MAX_NEW_TOKENS, 
+        "do_sample": True, 
+        "top_k": 10, 
+        "temperature": 0.7, 
+        "return_full_text": False, 
+        "repetition_penalty": 1.0, 
+        "encoder_repetition_penalty": 1.0, 
+        "use_cache": True
+    }
+)
+ov_llm.pipeline.tokenizer.pad_token_id = ov_llm.pipeline.tokenizer.eos_token_id
+
+print("Starting Auto-Chapter Creation")
+start_time = time.time()
 docs = asr_loader.load()
 text = docs_loader.format_docs(docs)
 text_splitter = RecursiveCharacterTextSplitter(chunk_size=3000, chunk_overlap=1000)
@@ -95,18 +116,6 @@ if args.k_means_enabled:
                 "start": '',
                 "end": ''
             })]
-
-
-ov_config = {"PERFORMANCE_HINT": "LATENCY", "NUM_STREAMS": "1", "CACHE_DIR": "./cache-ov-models"}
-ov_llm = HuggingFacePipeline.from_model_id(
-    model_id=args.model_id,
-    task="text-generation",
-    backend="openvino",
-    batch_size=args.llm_batch_size,
-    model_kwargs={"device": args.device, "ov_config": ov_config},
-    pipeline_kwargs={"max_new_tokens": MAX_NEW_TOKENS, "do_sample": True, "top_k": 10, "temperature": 0.7, "return_full_text": False, "repetition_penalty": 1.0, "encoder_repetition_penalty": 1.0, "use_cache": True},
-)
-ov_llm.pipeline.tokenizer.pad_token_id = ov_llm.pipeline.tokenizer.eos_token_id
 
 def get_summaries(transcript):
     for i in range(0, len(transcript)):

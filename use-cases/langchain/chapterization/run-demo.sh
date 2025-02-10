@@ -1,6 +1,9 @@
 #!/bin/bash
 
-source langchain_chapterization_env/bin/activate
+source activate-conda.sh
+activate_conda
+conda activate langchain_chapterization_env
+
 export TOKENIZERS_PARALLELISM=true
 
 INPUT_FILE=$1
