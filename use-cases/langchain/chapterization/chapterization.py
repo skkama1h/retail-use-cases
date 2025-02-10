@@ -64,6 +64,17 @@ ov_llm = HuggingFacePipeline.from_model_id(
     }
 )
 ov_llm.pipeline.tokenizer.pad_token_id = ov_llm.pipeline.tokenizer.eos_token_id
+if args.k_means_enabled:
+    from langchain_community.embeddings import OpenVINOEmbeddings
+    model_name = "sentence-transformers/all-mpnet-base-v2"
+    model_kwargs = {"device": args.device}
+    encode_kwargs = {"mean_pooling": True, "normalize_embeddings": True}
+
+    ov_embeddings = OpenVINOEmbeddings(
+        model_name_or_path=model_name,
+        model_kwargs=model_kwargs,
+        encode_kwargs=encode_kwargs,
+    )
 
 print("Starting Auto-Chapter Creation")
 start_time = time.time()
@@ -76,17 +87,6 @@ docs = text_splitter.create_documents([text])
 
 if args.k_means_enabled:
     # Convert to most relevant text in a single doc for single inference
-    from langchain_community.embeddings import OpenVINOEmbeddings
-    model_name = "sentence-transformers/all-mpnet-base-v2"
-    model_kwargs = {"device": args.device}
-    encode_kwargs = {"mean_pooling": True, "normalize_embeddings": True}
-
-    ov_embeddings = OpenVINOEmbeddings(
-        model_name_or_path=model_name,
-        model_kwargs=model_kwargs,
-        encode_kwargs=encode_kwargs,
-    )
-
     import numpy as np
     from sklearn.cluster import KMeans
 
