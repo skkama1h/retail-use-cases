@@ -1,12 +1,10 @@
 #!/bin/bash
 
-export DEBIAN_FRONTEND=noninteractive
-
 dpkg -s sudo &> /dev/null
 if [ $? != 0 ]
 then
-	apt update
-	apt install sudo -y
+	DEBIAN_FRONTEND=noninteractive apt update
+	DEBIAN_FRONTEND=noninteractive apt install sudo -y
 fi
 
 source activate-conda.sh
@@ -18,8 +16,8 @@ then
 	activate_conda
 else
 	echo "Installing chapterization dependencies"
-	sudo apt update
-	sudo apt install git ffmpeg vim wget -y
+	sudo DEBIAN_FRONTEND=noninteractive apt update
+	sudo DEBIAN_FRONTEND=noninteractive apt install git ffmpeg vim wget -y
 
 	CUR_DIR=`pwd`
         cd /tmp
