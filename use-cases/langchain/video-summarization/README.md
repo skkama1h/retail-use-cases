@@ -1,17 +1,10 @@
 # Summarize Videos Using OpenVINO-GenAI, Langchain, and MiniCPM-V-2_6  
 
 ## Installation
-* Install Intel Client GPU and OpenVINO Runtime from Archive.
+* Install Intel Client GPU, OpenVINO Runtime from Archive, and set up Conda Enviornment
 ```
 # Validated on Ubuntu 24.04 and 22.04
 bash install.sh
-```
-
-* Create Conda Enviornment and Set Up Python Enviornment 
-```
-conda create -n ovlangvidsumm python=3.10
-conda activate ovlangvidsumm
-pip install -r requirements.txt
 ```
 
 ## Convert and Save Optimized MiniCPM-V-2_6
