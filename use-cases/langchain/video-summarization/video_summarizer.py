@@ -5,12 +5,11 @@ import argparse
 import openvino_genai
 from langchain.prompts import PromptTemplate
 from ov_lvm_wrapper import OVMiniCPMV26Worker
-from video_chunk_loader import VideoChunkLoader
-
+from langchain_community.document_loaders.video import VideoChunkLoader
 
 def output_handler(text: str,
-                   filename: str = None,
-                   mode: str = None,
+                   filename: str = '',
+                   mode: str = 'w',
                    verbose: bool = True):
     
     # Print to terminal
@@ -18,7 +17,7 @@ def output_handler(text: str,
         print(text)
 
     # Write to file, if requested
-    if filename:
+    if filename != '':
         with open(filename, mode) as FH:
             print(text, file=FH)
 
@@ -51,7 +50,7 @@ if __name__ == '__main__':
     parser.add_argument("-r", "--resolution", type=int, nargs=2,
                         help="Desired spatial resolution of input video if different than original. Width x Height")
     parser.add_argument("-o", "--outfile", type=str,
-                        help="File to write generated text.")
+                        help="File to write generated text.", default='')
 
     tot_st_time = time.time()
     args = parser.parse_args()

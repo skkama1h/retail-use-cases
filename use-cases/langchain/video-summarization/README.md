@@ -1,7 +1,7 @@
-# Summarize Videos Using OpenVINO-GenAI, Langchain, and MiniCPM-V-2_6  
+# Summarize Videos Using OpenVINO-GenAI, Langchain, and MiniCPM-V-2_6
 
 ## Installation
-* Install Intel Client GPU, OpenVINO Runtime from Archive, and set up Conda Enviornment
+* Install Intel Client GPU, Conda, and Set Up Python Enviornment
 ```
 # Validated on Ubuntu 24.04 and 22.04
 bash install.sh
