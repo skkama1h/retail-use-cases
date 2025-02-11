@@ -8,14 +8,19 @@ __ROUGE-N:__ Evaluates the overlap of n-grams between candidate and reference te
 __BERTScore:__ Uses contextual embeddings to compare semantic similarity between cadidate and reference texts, capturing meaning beyond exact matches.
 
 ## Installation
-Get started by setting up your python enviornment.
+Get started by installing conda and setting up your python enviornment.
 ```
-conda create -n qualbench python=3.11
-conda activate qualbench
-pip install rouge-score nltk bert-score
+bash install.sh
 ```
 
 ## Run Examples
+The following script will by default compare the file "candidate_summarization.txt" against the file "reference_summarization.txt". 
 ```
 python run.py
 ```
+To compare different text documents, set the following arguments:
+
+    -c, --candidate_response CANDIDATE_RESPONSE
+                        Path to a candidate summarization response to test.
+    -r, --reference_response REFERENCE_RESPONSE
+                        Path to a reference summarization.
