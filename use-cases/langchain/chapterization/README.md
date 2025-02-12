@@ -9,6 +9,12 @@ Get started by running the below command.
 ./install.sh
 ```
 
+Note: if this script has already been performed and you'd like to re-install the sample project only then the below command can be used to skip the re-install of dependencies.
+
+```
+./install.sh --skip
+```
+
 ## Run Examples
 
 Run the below command to start the demo with the following defaults:
