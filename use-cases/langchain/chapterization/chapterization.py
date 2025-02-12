@@ -122,7 +122,6 @@ def get_summaries(transcript):
         end: "212.5",
         topic: "Greetings and Class Introduction",
         summary: "The teacher starts the session with greetings and pleasantries, creating a warm and positive atmosphere. By checking on students' well-being, the teacher fosters engagement and a sense of community, laying the groundwork for effective learning and connection."\n\n### Input\n{text}\n\n### Response:\n"""}]
-        print("DEBUG", template)
 
         formatted_prompt = ov_llm.pipeline.tokenizer.apply_chat_template(template, tokenize=False)
         summary = ov_llm.invoke(formatted_prompt)
