@@ -53,7 +53,7 @@ then
 else
 	echo "Installing dependencies"
 	sudo apt update
-	sudo apt install -y ffmpeg
+	sudo apt install -y ffmpeg wget
 
 	CUR_DIR=`pwd`
         cd /tmp
