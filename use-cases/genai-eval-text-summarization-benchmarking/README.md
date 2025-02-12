@@ -5,7 +5,7 @@ __BLEU:__ Measures the overlap of n-grams between a candidate text and reference
 
 __ROUGE-N:__ Evaluates the overlap of n-grams between candidate and reference texts, focusing on recall to assess content similarity in summarization tasks.
 
-__BERTScore:__ Uses contextual embeddings to compare semantic similarity between cadidate and reference texts, capturing meaning beyond exact matches.
+__BERTScore:__ Uses contextual embeddings to compare semantic similarity between candidate and reference texts, capturing meaning beyond exact matches.
 
 ## Installation
 Get started by installing conda and setting up your python enviornment.
