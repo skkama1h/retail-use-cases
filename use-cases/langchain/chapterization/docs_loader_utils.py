@@ -119,7 +119,6 @@ def chunk_transcript_docs(docs, chunk_size = 1500):
                             "start": str(eval(text_ts_start)[0]),
                             "end": str(eval(text_ts_end)[1])
                         })
-            print(f"{i} - Saving batch: {new_doc}\n")
             new_docs.append(new_doc)
             text_ts_start = None
             text_ts_end = None
