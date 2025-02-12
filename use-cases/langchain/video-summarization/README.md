@@ -16,13 +16,13 @@ optimum-cli export openvino -m openbmb/MiniCPM-V-2_6 --trust-remote-code --weigh
 ```
 
 ## Run Video Summarization
-Summarize a video using `video_summarizer.py`. For example, download the following video
+Summarize a video using `video_summarizer.py`. For example, start by downloading the following video:
  
 ```
 wget https://github.com/intel-iot-devkit/sample-videos/raw/master/one-by-one-person-detection.mp4
 ```
 
-Now create a summary using `video_summarizer.py`.
+Now create a summary of that video using `video_summarizer.py`:
 ```
 python video_summarizer.py one-by-one-person-detection.mp4 MiniCPM_INT8/ -d "GPU" -r 480 270 
 ```
