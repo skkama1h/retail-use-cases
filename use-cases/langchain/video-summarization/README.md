@@ -9,7 +9,6 @@ Install Intel Client GPU, Conda, and Set Up Python Enviornment
 
 Note: if this script has already been performed and you'd like to re-install the sample project only, the following command can be used to skip the re-install of dependencies.
 ```
-# Validated on Ubuntu 24.04 and 22.04
 ./install.sh --skip
 ```
 

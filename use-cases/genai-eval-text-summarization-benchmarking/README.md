@@ -10,17 +10,16 @@ __BERTScore:__ Uses contextual embeddings to compare semantic similarity between
 ## Installation
 Get started by installing conda and setting up your python enviornment.
 ```
-bash install.sh
+./install.sh
+```
+
+Note: if this script has already been performed and you'd like to re-install the sample project only, the following command can be used to skip the re-install of dependencies.
+```
+./install.sh --skip
 ```
 
 ## Run Examples
-The following script will by default compare the file "candidate_summarization.txt" against the file "reference_summarization.txt". 
+The following command will compare the file "candidate_summarization.txt" against the file "reference_summarization.txt" and generate the above metrics. 
 ```
-python run.py
+./run-demo.sh
 ```
-To compare different text documents, set the following arguments:
-
-    -c, --candidate_response CANDIDATE_RESPONSE
-                        Path to a candidate summarization response to test.
-    -r, --reference_response REFERENCE_RESPONSE
-                        Path to a reference summarization.
