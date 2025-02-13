@@ -16,4 +16,4 @@ INPUT_FILE="one-by-one-person-detection.mp4"
 DEVICE="GPU"
 RESOLUTION_X=480
 RESOLUTION_Y=270
-python video_summarizer.py INPUT_FILE MiniCPM_INT8/ -d "GPU" -r RESOLUTION_X RESOLUTION_Y
+python video_summarizer.py $INPUT_FILE MiniCPM_INT8/ -d $DEVICE -r $RESOLUTION_X $RESOLUTION_Y
