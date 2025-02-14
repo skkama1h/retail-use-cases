@@ -79,11 +79,8 @@ if args.k_means_enabled:
 print("Starting Auto-Chapter Creation")
 start_time = time.time()
 docs = asr_loader.load()
-text = docs_loader.format_docs(docs)
-text_splitter = RecursiveCharacterTextSplitter(chunk_size=3000, chunk_overlap=1000)
-
-# transcript broken into overlapping chunks
-docs = text_splitter.create_documents([text])
+# Chunk with timestamps in mind
+docs = docs_loader.chunk_transcript_docs(docs, chunk_size=3000)
 
 if args.k_means_enabled:
     # Convert to most relevant text in a single doc for single inference
@@ -103,34 +100,32 @@ if args.k_means_enabled:
         closest_index = np.argmin(distances)
         closest_indices.append(closest_index)
 
-    selected_indices = sorted(closest_indices)
+    selected_indices=sorted(closest_indices)
+    last_idx_sel = selected_indices[len(selected_indices)-1]
+    last_idx_docs = len(docs) - 1
+    if last_idx_sel != last_idx_docs:
+        # change final end time to end of stream
+        docs[last_idx_sel].metadata['end'] = docs[last_idx_docs].metadata['end']
     docs = [docs[doc] for doc in selected_indices]
 
-    # Note: this single batch method for large text is only supported 
-    # through this method due to limited GPU/OpenCL memory allocation
-    docs = [Document(page_content=docs_loader.format_docs(docs),
-            metadata={
-                "language": 'en',
-                "summary" : '',
-                "topic": '',
-                "start": '',
-                "end": ''
-            })]
+    # Note: this single reduced batch method for large text is only supported 
+    # due to limited GPU/OpenCL memory allocation limit
+    docs = [Document(page_content=docs_loader.format_transcript_docs(docs))]
 
 def get_summaries(transcript):
     for i in range(0, len(transcript)):
         doc_in = [transcript[i]]
         text = docs_loader.format_docs(doc_in)
 
-        template = [{"role": "user", "content": f"Write a response that appropriately completes the request.\n\n### Instruction:\nYou are a helpful assistant. The provided text contains material from an educational lecture. Chapterize the text by providing the main topic sentences and short summaries of the material. The sections should be organized similar to the following example:\ntopic: \"Greetings and Class Introduction\"\nsummary: \"The teacher starts the session with greetings and pleasantries, creating a warm and positive atmosphere. By checking on students' well-being, the teacher fosters engagement and a sense of community, laying the groundwork for effective learning and connection.\"\n\n### Input:\n{text}\n\n### Response:\n"}]
+        template = [{"role": "user", "content": f"""Write a response that appropriately completes the request.\n\n### Instruction:\nYou are a helpful assistant. Please generate a chapterization of the provided transcription. The transcript contains material from an educational lecture. Each line in the transcript contains a start time, an end time, and the transcribed text for a given sentence. The chapterization should break the lecture down into sections organized by topics with a short summary of the material. Each section should also contain timestamps, delineating the start and end of the section. These timestamps should be calculated using the sentence level timestamps from the transcriptions. The sections should be organized with correct spelling similar to the following example:
+        start: "0.0",
+        end: "212.5",
+        topic: "Greetings and Class Introduction",
+        summary: "The teacher starts the session with greetings and pleasantries, creating a warm and positive atmosphere. By checking on students' well-being, the teacher fosters engagement and a sense of community, laying the groundwork for effective learning and connection."\n\n### Input\n{text}\n\n### Response:\n"""}]
 
         formatted_prompt = ov_llm.pipeline.tokenizer.apply_chat_template(template, tokenize=False)
         summary = ov_llm.invoke(formatted_prompt)
         summary = summary.replace('assistant\n\n', '')
-        #print("Summaririze this: ", len(text), " ", text)
-        #print("\n--Chapterization: ", summary)
-        #print("-------------------------")
-        #print('\n\n')
         transcript[i].metadata["summary"] = summary
 
 
