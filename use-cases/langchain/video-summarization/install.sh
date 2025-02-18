@@ -1,5 +1,12 @@
 #!/bin/bash
 
+dpkg -s sudo &> /dev/null
+if [ $? != 0 ]
+then
+	DEBIAN_FRONTEND=noninteractive apt update
+	DEBIAN_FRONTEND=noninteractive apt install sudo -y
+fi
+
 # Install Conda
 source activate-conda.sh
 
@@ -7,53 +14,10 @@ source activate-conda.sh
 if [ "$1" == "--skip" ]; then
 	echo "Skipping dependencies"
 	activate_conda
-else
-
-    # Install Intel Client GPU. Install the Intel graphics GPG public key
-    wget -qO - https://repositories.intel.com/gpu/intel-graphics.key | \
-	sudo gpg --yes --dearmor --output /usr/share/keyrings/intel-graphics.gpg
-
-    # Continue installing Client GPU based on Ubuntu OS version
-    OS_VER=$(lsb_release -sr | cut -d'.' -f1)
-    echo $OS_VER
-    if [[ $OS_VER -le 24 ]]; then
-
-	# Configure the repositories.intel.com package repository
-	echo "deb [arch=amd64,i386 signed-by=/usr/share/keyrings/intel-graphics.gpg] https://repositories.intel.com/gpu/ubuntu noble client" | \
-	    sudo tee /etc/apt/sources.list.d/intel-gpu-noble.list
-
-	# Update the package repository meta-data
-	sudo apt update
-
-	# Install the compute-related packages
-	apt-get install -y libze-intel-gpu1 libze1 intel-opencl-icd clinfo intel-gsc
-
-	# Install PyTorch dependencies
-	apt-get install -y libze-dev intel-ocloc
-    
-    elif [[ $OS_VER -le 22 ]]; then
-
-	# Configure the repositories.intel.com package repository
-	echo "deb [arch=amd64,i386 signed-by=/usr/share/keyrings/intel-graphics.gpg] https://repositories.intel.com/gpu/ubuntu jammy client" | \
-	    sudo tee /etc/apt/sources.list.d/intel-gpu-jammy.list
-
-	# Update the package repository meta-data
-	sudo apt update
-
-	# Install the compute-related packages
-	apt-get install -y libze-intel-gpu1 libze1 intel-opencl-icd clinfo
-
-	# Install PyTorch dependencies    
-	apt-get install -y libze-dev intel-ocloc
-    
-    else
-	echo "Only Ubuntu 24.04 and 22.04 supported. Canceling..."
-	exit 1
-    fi
-    
-	echo "Installing dependencies"
-	sudo apt update
-	sudo apt install -y ffmpeg wget
+else    
+        echo "Installing dependencies"
+	sudo DEBIAN_FRONTEND=noninteractive apt update
+	sudo DEBIAN_FRONTEND=noninteractive apt install git ffmpeg wget -y
 
 	CUR_DIR=`pwd`
         cd /tmp
@@ -65,6 +29,21 @@ else
 	activate_conda
 	conda init
 	cd $CUR_DIR
+
+	# neo/opencl drivers 24.45.31740.9
+	mkdir neo
+	cd neo
+	wget https://github.com/intel/intel-graphics-compiler/releases/download/v2.5.6/intel-igc-core-2_2.5.6+18417_amd64.deb
+	wget https://github.com/intel/intel-graphics-compiler/releases/download/v2.5.6/intel-igc-opencl-2_2.5.6+18417_amd64.deb
+	wget https://github.com/intel/compute-runtime/releases/download/24.52.32224.5/intel-level-zero-gpu-dbgsym_1.6.32224.5_amd64.ddeb
+	wget https://github.com/intel/compute-runtime/releases/download/24.52.32224.5/intel-level-zero-gpu_1.6.32224.5_amd64.deb
+	wget https://github.com/intel/compute-runtime/releases/download/24.52.32224.5/intel-opencl-icd-dbgsym_24.52.32224.5_amd64.ddeb
+	wget https://github.com/intel/compute-runtime/releases/download/24.52.32224.5/intel-opencl-icd_24.52.32224.5_amd64.deb
+	wget https://github.com/intel/compute-runtime/releases/download/24.52.32224.5/libigdgmm12_22.5.5_amd64.deb
+	sudo dpkg -i *.deb
+	# sudo apt install ocl-icd-libopencl1
+	cd ..
+	
 fi
 
 # Create python enviornment
